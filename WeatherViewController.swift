@@ -27,6 +27,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var temperatureLabel: UILabel!
 
+    @IBOutlet weak var degreeSwitch: UISwitch!
+    @IBOutlet weak var celsiusLabel: UILabel!
+    @IBOutlet weak var fahrenheitLabel: UILabel!
     
     override func viewDidLoad() {
         
@@ -37,7 +40,10 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
+        
+        initialDegreeSwitchUI()
     }
+    
     
     
     
@@ -53,7 +59,6 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             switch response.result {
                 
             case .success:
-                print("Success! Got the weather data")
                 
                 let weatherJSON : JSON = JSON(response.result.value!)
                 
@@ -76,7 +81,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         
         guard let tempResult = json["main"]["temp"].double else { return cityLabel.text = "Weather Unavailable" }
         
-        weatherDataModel.temperature = Int(tempResult - 273.15)
+        
+        weatherDataModel.temperatureInCelsius = Int(tempResult - 273.15)
+        
+        weatherDataModel.temperatureInFahrenheit = Int((tempResult - 273.15) * 1.8 + 32)
+    
         
         weatherDataModel.city = json["name"].stringValue
         
@@ -94,18 +103,37 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //MARK: - UI Updates
     
     //Write the updateUIWithWeatherData method here:
+    
     func updateUIWithWeatherData() {
         
         cityLabel.text = weatherDataModel.city
         
-        temperatureLabel.text = String(weatherDataModel.temperature)
+        temperatureLabel.text = String(weatherDataModel.temperatureInCelsius) + "°"
         
         weatherIcon.image = UIImage(named: weatherDataModel.weatherIconName)
-        
     }
     
+    @IBAction func degreeSwitchPressed(_ sender: UISwitch) {
+        
+        if degreeSwitch.isOn {
+            temperatureLabel.text = String(weatherDataModel.temperatureInCelsius) + "°"
+            celsiusLabel.textColor = UIColor.white
+            fahrenheitLabel.textColor = UIColor.darkGray
+            
+        } else {
+            temperatureLabel.text = String(weatherDataModel.temperatureInFahrenheit) + "°"
+            celsiusLabel.textColor = UIColor.darkGray
+            fahrenheitLabel.textColor = UIColor.white
+        }
+    }
     
+    func initialDegreeSwitchUI() {
+        degreeSwitch.setOn(true, animated: true)
+        celsiusLabel.textColor = UIColor.white
+        fahrenheitLabel.textColor = UIColor.darkGray
+    }
     
+
     
     
     //MARK: - Location Manager Delegate Methods
@@ -144,7 +172,13 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     //Write the userEnteredANewCityName Delegate method here:
     func userEnteredANewCityName(city: String) {
-        print(city)
+        
+        let params : [String : String] = ["q" : city, "appid" : APP_ID]
+        
+        getWeatherData(url: WEATHER_URL, parameter: params)
+        
+        initialDegreeSwitchUI()
+        
     }
     
     //Write the PrepareForSegue Method here
@@ -154,6 +188,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             let destivationVC = segue.destination as! ChangeCityViewController
             
             destivationVC.delegate = self
+            
         }
     }
     
