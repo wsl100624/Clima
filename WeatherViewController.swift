@@ -52,7 +52,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //Write the getWeatherData method here:
     func getWeatherData(url: String, parameter: [String : String]) {
         
-        Alamofire.request(url, method: .get, parameters: parameter).responseJSON {
+        Alamofire.request(url, parameters: parameter).responseJSON {
             
             response in
             
@@ -60,12 +60,14 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
                 
             case .success:
                 
-                let weatherJSON : JSON = JSON(response.result.value!)
+                let weatherData : JSON = JSON(response.result.value!)
                 
-                self.updateWeatherData(json: weatherJSON)
+                self.updateWeatherData(data: weatherData)
                 
             case .failure(let error):
+                
                 print(error)
+                
                 self.cityLabel.text = "Connection Issues"
             }
         }
@@ -77,19 +79,18 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //MARK: - JSON Parsing
     
     //Write the updateWeatherData method here:
-    func updateWeatherData(json: JSON) {
+    func updateWeatherData(data: JSON) {
         
-        guard let tempResult = json["main"]["temp"].double else { return cityLabel.text = "Weather Unavailable" }
-        
+        guard let tempResult = data["main"]["temp"].double else { return cityLabel.text = "Weather Unavailable" }
         
         weatherDataModel.temperatureInCelsius = Int(tempResult - 273.15)
         
         weatherDataModel.temperatureInFahrenheit = Int((tempResult - 273.15) * 1.8 + 32)
     
         
-        weatherDataModel.city = json["name"].stringValue
+        weatherDataModel.city = data["name"].stringValue
         
-        weatherDataModel.condition = json["weather"][0]["id"].intValue
+        weatherDataModel.condition = data["weather"][0]["id"].intValue
         
         weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
         
@@ -188,7 +189,6 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             let destivationVC = segue.destination as! ChangeCityViewController
             
             destivationVC.delegate = self
-            
         }
     }
     

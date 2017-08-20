@@ -21,10 +21,9 @@ class ChangeCityViewController: UIViewController {
     //Declare the delegate variable here:
     var delegate : ChangeCityDelegate?
     
-    
-    //This is the pre-linked IBOutlets to the text field:
+    //IBOutlets to the text field:
     @IBOutlet weak var changeCityTextField: UITextField!
-
+    
     
     //This is the IBAction that gets called when the user taps on the "Get Weather" button:
     @IBAction func getWeatherPressed(_ sender: AnyObject) {
@@ -38,7 +37,10 @@ class ChangeCityViewController: UIViewController {
             delegate?.userEnteredANewCityName(city: cityName)
             
             //3 dismiss the Change City View Controller to go back to the WeatherViewController
-            self.dismiss(animated: true, completion: nil)
+            dismiss(animated: true, completion: nil)
+            
+            hideKeyboard()
+            
         } else {
             
             return
@@ -50,4 +52,7 @@ class ChangeCityViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
+    func hideKeyboard() {
+        view.endEditing(true)
+    }
 }
