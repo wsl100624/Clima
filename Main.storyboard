@@ -104,7 +104,7 @@
                                     <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <connections>
-                                    <segue destination="P1Y-dL-zMM" kind="presentation" identifier="changeCityName" id="miH-QC-hxD"/>
+                                    <segue destination="P1Y-dL-zMM" kind="presentation" identifier="changeCityName" modalTransitionStyle="crossDissolve" id="miH-QC-hxD"/>
                                 </connections>
                             </button>
                         </subviews>
